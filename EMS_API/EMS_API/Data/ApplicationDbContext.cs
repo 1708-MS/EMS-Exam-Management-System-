@@ -18,9 +18,6 @@ namespace EMS_API.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            modelBuilder.Entity<StudentSubject>().HasKey(t => new { t.StudentId, t.SubjectId });
-            modelBuilder.Entity<StudentTeacher>().HasKey(t => new { t.StudentId, t.TeacherId });
         }
-
     }
 }

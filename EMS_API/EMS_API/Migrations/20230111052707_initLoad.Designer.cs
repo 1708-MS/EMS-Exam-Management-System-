@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMSAPI.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230110115910_initLoadAddStudentSubjectTeacherTables")]
-    partial class initLoadAddStudentSubjectTeacherTables
+    [Migration("20230111052707_initLoad")]
+    partial class initLoad
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

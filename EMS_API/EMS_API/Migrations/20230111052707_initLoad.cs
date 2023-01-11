@@ -5,7 +5,7 @@
 namespace EMSAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class initLoadAddStudentSubjectTeacherTables : Migration
+    public partial class initLoad : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
