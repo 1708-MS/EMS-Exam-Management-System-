@@ -10,7 +10,7 @@ namespace EMS_API.Models
         public int TeacherId { get; set; }
         public Teacher Teacher { get; set; }
         public ICollection<StudentSubject> StudentSubjects { get; set; }
-        public ICollection<ExamPaper> ExamPapers { get; set; }
+        public ExamPaper ExamPapers { get; set; }
 
     }
 }
