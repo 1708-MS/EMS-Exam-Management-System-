@@ -4,14 +4,8 @@
     {
         public int QuestionId { get; set; }
         public string QuestionText { get; set; }
-        public string MCQsOptions { get; set; }
+        public List<MCQOptions> MCQOptions { get; set; }
         public ICollection<Answer> Answers { get; set; }
         public QuestionType QuestionType { get; set; }
-    }
-    public enum QuestionType
-    {
-        ShortAnswer = 1,
-        LongAnswer = 2,
-        MCQs = 3
     }
 }
