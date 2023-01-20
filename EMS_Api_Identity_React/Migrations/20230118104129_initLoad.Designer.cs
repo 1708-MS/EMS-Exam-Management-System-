@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EMSApiIdentityReact.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230117100101_initLoad")]
+    [Migration("20230118104129_initLoad")]
     partial class initLoad
     {
         /// <inheritdoc />
@@ -25,6 +25,36 @@ namespace EMSApiIdentityReact.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ApplicationUserExamPaper", b =>
+                {
+                    b.Property<string>("ApplicationUsersId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ExamPapersExamPaperId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApplicationUsersId", "ExamPapersExamPaperId");
+
+                    b.HasIndex("ExamPapersExamPaperId");
+
+                    b.ToTable("ApplicationUserExamPaper");
+                });
+
+            modelBuilder.Entity("ApplicationUserSubject", b =>
+                {
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("SubjectsSubjectId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ApplicationUserId", "SubjectsSubjectId");
+
+                    b.HasIndex("SubjectsSubjectId");
+
+                    b.ToTable("ApplicationUserSubject");
+                });
+
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Answer", b =>
                 {
                     b.Property<int>("AnswerId")
@@ -33,28 +63,24 @@ namespace EMSApiIdentityReact.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AnswerId"));
 
-                    b.Property<int?>("AnswerSheetId")
+                    b.Property<float>("AnswerMarks")
+                        .HasColumnType("real");
+
+                    b.Property<int>("AnswerSheetId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("LongAnswer")
+                    b.Property<string>("AnswerText")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
-                    b.Property<string>("ShortAnswer")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("AnswerId");
 
                     b.HasIndex("AnswerSheetId");
 
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("QuestionId");
+                    b.HasIndex("QuestionId")
+                        .IsUnique();
 
                     b.ToTable("Answers");
                 });
@@ -73,9 +99,14 @@ namespace EMSApiIdentityReact.Migrations
                     b.Property<int>("ExamPaperId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsChecked")
+                        .HasColumnType("bit");
+
                     b.HasKey("AnswerSheetId");
 
                     b.HasIndex("ApplicationUserId");
+
+                    b.HasIndex("ExamPaperId");
 
                     b.ToTable("AnswerSheets");
                 });
@@ -88,68 +119,12 @@ namespace EMSApiIdentityReact.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ExamPaperId"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
 
                     b.HasKey("ExamPaperId");
 
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("SubjectId");
-
                     b.ToTable("ExamPapers");
-                });
-
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.Grades", b =>
-                {
-                    b.Property<int>("GradesId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GradesId"));
-
-                    b.Property<int>("AnswerSheetId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ExamPaperId")
-                        .HasColumnType("int");
-
-                    b.Property<double>("LongAnswerMarks")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MCQsMarks")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MCQsNegativeMarks")
-                        .HasColumnType("float");
-
-                    b.Property<double>("MarksGivenForEachQuestion")
-                        .HasColumnType("float");
-
-                    b.Property<double>("ShortAnswerMarks")
-                        .HasColumnType("float");
-
-                    b.Property<double>("TotalMarks")
-                        .HasColumnType("float");
-
-                    b.Property<double>("TotalMarksObtained")
-                        .HasColumnType("float");
-
-                    b.HasKey("GradesId");
-
-                    b.HasIndex("AnswerSheetId");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.HasIndex("ExamPaperId");
-
-                    b.ToTable("Grades");
                 });
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Identity.ApplicationUser", b =>
@@ -220,19 +195,16 @@ namespace EMSApiIdentityReact.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.MCQOptions", b =>
+            modelBuilder.Entity("EMS_Api_Identity_React.Models.MCQOption", b =>
                 {
-                    b.Property<int>("MCQOptionsId")
+                    b.Property<int>("MCQOptionId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MCQOptionsId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MCQOptionId"));
 
                     b.Property<int>("AnswerId")
                         .HasColumnType("int");
-
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("QuestionId")
                         .HasColumnType("int");
@@ -240,11 +212,9 @@ namespace EMSApiIdentityReact.Migrations
                     b.Property<string>("SubmittedAnswerOfMCQ")
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("MCQOptionsId");
+                    b.HasKey("MCQOptionId");
 
                     b.HasIndex("AnswerId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("QuestionId");
 
@@ -259,11 +229,14 @@ namespace EMSApiIdentityReact.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("QuestionId"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("AnswerId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ExamPaperId")
                         .HasColumnType("int");
+
+                    b.Property<float>("QuestionMarks")
+                        .HasColumnType("real");
 
                     b.Property<string>("QuestionText")
                         .HasColumnType("nvarchar(max)");
@@ -272,8 +245,6 @@ namespace EMSApiIdentityReact.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("QuestionId");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("ExamPaperId");
 
@@ -288,15 +259,16 @@ namespace EMSApiIdentityReact.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SubjectId"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<int>("ExamPaperId")
+                        .HasColumnType("int");
 
                     b.Property<string>("SubjectName")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("SubjectId");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("ExamPaperId")
+                        .IsUnique();
 
                     b.ToTable("Subjects");
                 });
@@ -449,85 +421,79 @@ namespace EMSApiIdentityReact.Migrations
                     b.HasDiscriminator().HasValue("ApplicationRole");
                 });
 
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.Answer", b =>
+            modelBuilder.Entity("ApplicationUserExamPaper", b =>
                 {
-                    b.HasOne("EMS_Api_Identity_React.Models.AnswerSheet", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("AnswerSheetId");
-
                     b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", null)
-                        .WithMany("Answers")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("EMS_Api_Identity_React.Models.Question", "Question")
-                        .WithMany("Answers")
-                        .HasForeignKey("QuestionId")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUsersId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("EMS_Api_Identity_React.Models.ExamPaper", null)
+                        .WithMany()
+                        .HasForeignKey("ExamPapersExamPaperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ApplicationUserSubject", b =>
+                {
+                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", null)
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EMS_Api_Identity_React.Models.Subject", null)
+                        .WithMany()
+                        .HasForeignKey("SubjectsSubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("EMS_Api_Identity_React.Models.Answer", b =>
+                {
+                    b.HasOne("EMS_Api_Identity_React.Models.AnswerSheet", "AnswerSheet")
+                        .WithMany("Answers")
+                        .HasForeignKey("AnswerSheetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EMS_Api_Identity_React.Models.Question", "Question")
+                        .WithOne("Answer")
+                        .HasForeignKey("EMS_Api_Identity_React.Models.Answer", "QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AnswerSheet");
 
                     b.Navigation("Question");
                 });
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.AnswerSheet", b =>
                 {
-                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", null)
-                        .WithMany("AnswerSheets")
-                        .HasForeignKey("ApplicationUserId");
-                });
-
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.ExamPaper", b =>
-                {
-                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", "ApplicationUsers")
-                        .WithMany("ExamPapers")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("EMS_Api_Identity_React.Models.Subject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUsers");
-
-                    b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.Grades", b =>
-                {
-                    b.HasOne("EMS_Api_Identity_React.Models.AnswerSheet", "AnswerSheet")
-                        .WithMany()
-                        .HasForeignKey("AnswerSheetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", "ApplicationUser")
-                        .WithMany("Grades")
+                        .WithMany("AnswerSheets")
                         .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("EMS_Api_Identity_React.Models.ExamPaper", "ExamPaper")
-                        .WithMany()
+                        .WithMany("AnswerSheets")
                         .HasForeignKey("ExamPaperId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AnswerSheet");
 
                     b.Navigation("ApplicationUser");
 
                     b.Navigation("ExamPaper");
                 });
 
-            modelBuilder.Entity("EMS_Api_Identity_React.Models.MCQOptions", b =>
+            modelBuilder.Entity("EMS_Api_Identity_React.Models.MCQOption", b =>
                 {
                     b.HasOne("EMS_Api_Identity_React.Models.Answer", "Answer")
                         .WithMany("MCQOptions")
                         .HasForeignKey("AnswerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", null)
-                        .WithMany("MCQOptions")
-                        .HasForeignKey("ApplicationUserId");
 
                     b.HasOne("EMS_Api_Identity_React.Models.Question", null)
                         .WithMany("MCQOptions")
@@ -538,10 +504,6 @@ namespace EMSApiIdentityReact.Migrations
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Question", b =>
                 {
-                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", null)
-                        .WithMany("Questions")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("EMS_Api_Identity_React.Models.ExamPaper", null)
                         .WithMany("Questions")
                         .HasForeignKey("ExamPaperId");
@@ -549,11 +511,13 @@ namespace EMSApiIdentityReact.Migrations
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Subject", b =>
                 {
-                    b.HasOne("EMS_Api_Identity_React.Models.Identity.ApplicationUser", "ApplicationUser")
-                        .WithMany("Subjects")
-                        .HasForeignKey("ApplicationUserId");
+                    b.HasOne("EMS_Api_Identity_React.Models.ExamPaper", "ExamPaper")
+                        .WithOne("Subject")
+                        .HasForeignKey("EMS_Api_Identity_React.Models.Subject", "ExamPaperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("ApplicationUser");
+                    b.Navigation("ExamPaper");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -619,29 +583,21 @@ namespace EMSApiIdentityReact.Migrations
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.ExamPaper", b =>
                 {
+                    b.Navigation("AnswerSheets");
+
                     b.Navigation("Questions");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Identity.ApplicationUser", b =>
                 {
                     b.Navigation("AnswerSheets");
-
-                    b.Navigation("Answers");
-
-                    b.Navigation("ExamPapers");
-
-                    b.Navigation("Grades");
-
-                    b.Navigation("MCQOptions");
-
-                    b.Navigation("Questions");
-
-                    b.Navigation("Subjects");
                 });
 
             modelBuilder.Entity("EMS_Api_Identity_React.Models.Question", b =>
                 {
-                    b.Navigation("Answers");
+                    b.Navigation("Answer");
 
                     b.Navigation("MCQOptions");
                 });

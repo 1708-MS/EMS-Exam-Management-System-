@@ -53,6 +53,19 @@ namespace EMSApiIdentityReact.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ExamPapers",
+                columns: table => new
+                {
+                    ExamPaperId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ExamPapers", x => x.ExamPaperId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -71,25 +84,6 @@ namespace EMSApiIdentityReact.Migrations
                         principalTable: "AspNetRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AnswerSheets",
-                columns: table => new
-                {
-                    AnswerSheetId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ExamPaperId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AnswerSheets", x => x.AnswerSheetId);
-                    table.ForeignKey(
-                        name: "FK_AnswerSheets_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -178,83 +172,50 @@ namespace EMSApiIdentityReact.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Subjects",
+                name: "AnswerSheets",
                 columns: table => new
                 {
-                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                    AnswerSheetId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SubjectName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Subjects", x => x.SubjectId);
-                    table.ForeignKey(
-                        name: "FK_Subjects_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ExamPapers",
-                columns: table => new
-                {
-                    ExamPaperId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    SubjectId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ExamPapers", x => x.ExamPaperId);
-                    table.ForeignKey(
-                        name: "FK_ExamPapers_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ExamPapers_Subjects_SubjectId",
-                        column: x => x.SubjectId,
-                        principalTable: "Subjects",
-                        principalColumn: "SubjectId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Grades",
-                columns: table => new
-                {
-                    GradesId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ExamPaperId = table.Column<int>(type: "int", nullable: false),
-                    AnswerSheetId = table.Column<int>(type: "int", nullable: false),
-                    TotalMarks = table.Column<double>(type: "float", nullable: false),
-                    LongAnswerMarks = table.Column<double>(type: "float", nullable: false),
-                    ShortAnswerMarks = table.Column<double>(type: "float", nullable: false),
-                    MCQsMarks = table.Column<double>(type: "float", nullable: false),
-                    MCQsNegativeMarks = table.Column<double>(type: "float", nullable: false),
-                    MarksGivenForEachQuestion = table.Column<double>(type: "float", nullable: false),
-                    TotalMarksObtained = table.Column<double>(type: "float", nullable: false)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IsChecked = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Grades", x => x.GradesId);
+                    table.PrimaryKey("PK_AnswerSheets", x => x.AnswerSheetId);
                     table.ForeignKey(
-                        name: "FK_Grades_AnswerSheets_AnswerSheetId",
-                        column: x => x.AnswerSheetId,
-                        principalTable: "AnswerSheets",
-                        principalColumn: "AnswerSheetId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Grades_AspNetUsers_ApplicationUserId",
+                        name: "FK_AnswerSheets_AspNetUsers_ApplicationUserId",
                         column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Grades_ExamPapers_ExamPaperId",
+                        name: "FK_AnswerSheets_ExamPapers_ExamPaperId",
                         column: x => x.ExamPaperId,
+                        principalTable: "ExamPapers",
+                        principalColumn: "ExamPaperId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ApplicationUserExamPaper",
+                columns: table => new
+                {
+                    ApplicationUsersId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ExamPapersExamPaperId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserExamPaper", x => new { x.ApplicationUsersId, x.ExamPapersExamPaperId });
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserExamPaper_AspNetUsers_ApplicationUsersId",
+                        column: x => x.ApplicationUsersId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserExamPaper_ExamPapers_ExamPapersExamPaperId",
+                        column: x => x.ExamPapersExamPaperId,
                         principalTable: "ExamPapers",
                         principalColumn: "ExamPaperId",
                         onDelete: ReferentialAction.Cascade);
@@ -267,18 +228,14 @@ namespace EMSApiIdentityReact.Migrations
                     QuestionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     QuestionText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    QuestionMarks = table.Column<float>(type: "real", nullable: false),
+                    AnswerId = table.Column<int>(type: "int", nullable: false),
                     QuestionType = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     ExamPaperId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Questions", x => x.QuestionId);
-                    table.ForeignKey(
-                        name: "FK_Questions_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Questions_ExamPapers_ExamPaperId",
                         column: x => x.ExamPaperId,
@@ -287,16 +244,35 @@ namespace EMSApiIdentityReact.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Subjects",
+                columns: table => new
+                {
+                    SubjectId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SubjectName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ExamPaperId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Subjects", x => x.SubjectId);
+                    table.ForeignKey(
+                        name: "FK_Subjects_ExamPapers_ExamPaperId",
+                        column: x => x.ExamPaperId,
+                        principalTable: "ExamPapers",
+                        principalColumn: "ExamPaperId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Answers",
                 columns: table => new
                 {
                     AnswerId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionId = table.Column<int>(type: "int", nullable: false),
-                    ShortAnswer = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    LongAnswer = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AnswerSheetId = table.Column<int>(type: "int", nullable: true),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    AnswerText = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AnswerMarks = table.Column<float>(type: "real", nullable: false),
+                    AnswerSheetId = table.Column<int>(type: "int", nullable: false),
+                    QuestionId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -305,12 +281,8 @@ namespace EMSApiIdentityReact.Migrations
                         name: "FK_Answers_AnswerSheets_AnswerSheetId",
                         column: x => x.AnswerSheetId,
                         principalTable: "AnswerSheets",
-                        principalColumn: "AnswerSheetId");
-                    table.ForeignKey(
-                        name: "FK_Answers_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "AnswerSheetId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Answers_Questions_QuestionId",
                         column: x => x.QuestionId,
@@ -320,30 +292,48 @@ namespace EMSApiIdentityReact.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ApplicationUserSubject",
+                columns: table => new
+                {
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    SubjectsSubjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ApplicationUserSubject", x => new { x.ApplicationUserId, x.SubjectsSubjectId });
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserSubject_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ApplicationUserSubject_Subjects_SubjectsSubjectId",
+                        column: x => x.SubjectsSubjectId,
+                        principalTable: "Subjects",
+                        principalColumn: "SubjectId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MCQOptions",
                 columns: table => new
                 {
-                    MCQOptionsId = table.Column<int>(type: "int", nullable: false)
+                    MCQOptionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SubmittedAnswerOfMCQ = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AnswerId = table.Column<int>(type: "int", nullable: false),
-                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     QuestionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_MCQOptions", x => x.MCQOptionsId);
+                    table.PrimaryKey("PK_MCQOptions", x => x.MCQOptionId);
                     table.ForeignKey(
                         name: "FK_MCQOptions_Answers_AnswerId",
                         column: x => x.AnswerId,
                         principalTable: "Answers",
                         principalColumn: "AnswerId",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MCQOptions_AspNetUsers_ApplicationUserId",
-                        column: x => x.ApplicationUserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_MCQOptions_Questions_QuestionId",
                         column: x => x.QuestionId,
@@ -357,19 +347,30 @@ namespace EMSApiIdentityReact.Migrations
                 column: "AnswerSheetId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Answers_ApplicationUserId",
-                table: "Answers",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
                 table: "Answers",
-                column: "QuestionId");
+                column: "QuestionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AnswerSheets_ApplicationUserId",
                 table: "AnswerSheets",
                 column: "ApplicationUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AnswerSheets_ExamPaperId",
+                table: "AnswerSheets",
+                column: "ExamPaperId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserExamPaper_ExamPapersExamPaperId",
+                table: "ApplicationUserExamPaper",
+                column: "ExamPapersExamPaperId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserSubject_SubjectsSubjectId",
+                table: "ApplicationUserSubject",
+                column: "SubjectsSubjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -411,39 +412,9 @@ namespace EMSApiIdentityReact.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ExamPapers_ApplicationUserId",
-                table: "ExamPapers",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ExamPapers_SubjectId",
-                table: "ExamPapers",
-                column: "SubjectId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Grades_AnswerSheetId",
-                table: "Grades",
-                column: "AnswerSheetId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Grades_ApplicationUserId",
-                table: "Grades",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Grades_ExamPaperId",
-                table: "Grades",
-                column: "ExamPaperId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_MCQOptions_AnswerId",
                 table: "MCQOptions",
                 column: "AnswerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MCQOptions_ApplicationUserId",
-                table: "MCQOptions",
-                column: "ApplicationUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MCQOptions_QuestionId",
@@ -451,24 +422,26 @@ namespace EMSApiIdentityReact.Migrations
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Questions_ApplicationUserId",
-                table: "Questions",
-                column: "ApplicationUserId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Questions_ExamPaperId",
                 table: "Questions",
                 column: "ExamPaperId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Subjects_ApplicationUserId",
+                name: "IX_Subjects_ExamPaperId",
                 table: "Subjects",
-                column: "ApplicationUserId");
+                column: "ExamPaperId",
+                unique: true);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ApplicationUserExamPaper");
+
+            migrationBuilder.DropTable(
+                name: "ApplicationUserSubject");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -485,10 +458,10 @@ namespace EMSApiIdentityReact.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Grades");
+                name: "MCQOptions");
 
             migrationBuilder.DropTable(
-                name: "MCQOptions");
+                name: "Subjects");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
@@ -503,13 +476,10 @@ namespace EMSApiIdentityReact.Migrations
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "ExamPapers");
-
-            migrationBuilder.DropTable(
-                name: "Subjects");
-
-            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "ExamPapers");
         }
     }
 }

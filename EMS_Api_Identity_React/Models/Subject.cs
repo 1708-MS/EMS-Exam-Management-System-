@@ -6,7 +6,8 @@ namespace EMS_Api_Identity_React.Models
     {
         public int SubjectId { get; set; }
         public string SubjectName { get; set; }
-        public string ApplicationUserId { get; set; }
-        public ApplicationUser ApplicationUser { get; set; }
+        public int ExamPaperId { get; set; }
+        public ExamPaper ExamPaper { get; set; }
+        public ICollection<ApplicationUser> ApplicationUser { get; set; }
     }
 }

@@ -1,6 +1,9 @@
 using EMS_Api_Identity_React.Data;
+using EMS_Api_Identity_React.DtoMapping;
 using EMS_Api_Identity_React.Identity;
 using EMS_Api_Identity_React.Models.Identity;
+using EMS_Api_Identity_React.Services;
+using EMS_Api_Identity_React.Services.Email_Service.Email_Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +23,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Mapping));
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
 
 var app = builder.Build();
 
