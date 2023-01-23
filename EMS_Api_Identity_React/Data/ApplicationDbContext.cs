@@ -23,8 +23,10 @@ namespace EMS_Api_Identity_React.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<ApplicationRole>().ToTable("AspNetRoles");
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+            
         }
     }
 }

@@ -1,5 +1,6 @@
 using EMS_Api_Identity_React.Data;
 using EMS_Api_Identity_React.DtoMapping;
+using EMS_Api_Identity_React.Email;
 using EMS_Api_Identity_React.Identity;
 using EMS_Api_Identity_React.Models.Identity;
 using EMS_Api_Identity_React.Services;
@@ -26,6 +27,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(Mapping));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
+builder.Services.AddTransient<IEmailTemplateService, EmailTemplateService>();
 
 var app = builder.Build();
 

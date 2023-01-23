@@ -18,12 +18,12 @@ namespace EMS_Api_Identity_React.Services
         {
             try
             {
-                string toEmail = string.IsNullOrEmpty(email) ? _emailSettings.ToEmail : email;
-                MailMessage mail = new MailMessage
+                string toemail = string.IsNullOrEmpty(email) ? _emailSettings.ToEmail : email;
+                MailMessage mail = new MailMessage()
                 {
-                    From = new MailAddress(_emailSettings.UserNameEmail, "Test Email")
+                    From = new MailAddress(_emailSettings.UserEmail, "Test Email")
                 };
-                mail.To.Add(new MailAddress(toEmail));
+                mail.To.Add(new MailAddress(toemail));
                 mail.Subject = "Test Email";
                 mail.Body = htmlMessage;
                 mail.IsBodyHtml = true;
@@ -31,7 +31,7 @@ namespace EMS_Api_Identity_React.Services
 
                 using (SmtpClient smtp = new SmtpClient(_emailSettings.PrimaryDomain, _emailSettings.PrimaryPort))
                 {
-                    smtp.Credentials = new NetworkCredential(_emailSettings.UserNameEmail, _emailSettings.UserNamePassword);
+                    smtp.Credentials = new NetworkCredential(_emailSettings.UserEmail, _emailSettings.UserPassword);
                     smtp.EnableSsl = true;
                     await smtp.SendMailAsync(mail);
                 }
@@ -42,5 +42,6 @@ namespace EMS_Api_Identity_React.Services
                 string str = ex.Message;
             }
         }
+
     }
 }
