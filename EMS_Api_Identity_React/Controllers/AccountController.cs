@@ -38,8 +38,6 @@ namespace EMS_Api_Identity_React.Controllers
         }
 
 
-
-
         [HttpPost("ConfirmEmail")]
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailViewModel model)
         {
