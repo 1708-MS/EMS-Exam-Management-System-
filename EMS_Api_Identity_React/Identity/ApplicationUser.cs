@@ -8,7 +8,7 @@ namespace EMS_Api_Identity_React.Models.Identity
         [NotMapped]
         public string Token { get; set; }
         [NotMapped]
-        public string Role { get; set; }
+        public string Roles { get; set; }
         public string Address { get; set; }
         public ICollection<Subject> Subjects { get; set; }
         public ICollection<ExamPaper> ExamPapers { get; set; }

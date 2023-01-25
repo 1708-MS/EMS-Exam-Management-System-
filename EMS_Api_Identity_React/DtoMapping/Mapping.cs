@@ -12,6 +12,7 @@ namespace EMS_Api_Identity_React.DtoMapping
         {
             CreateMap<ApplicationUser, UserSignInDto>().ReverseMap();
             CreateMap<ApplicationUser, UserSignUpDto>().ReverseMap();
+            CreateMap<ApplicationUser, TeacherDto>().ReverseMap();
             CreateMap<Subject, SubjectDto>().ReverseMap();
         }
     }

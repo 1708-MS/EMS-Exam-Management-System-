@@ -5,6 +5,7 @@ using EMS_Api_Identity_React.Identity;
 using EMS_Api_Identity_React.Models.Identity;
 using EMS_Api_Identity_React.Services;
 using EMS_Api_Identity_React.Services.Email_Service.Email_Interface;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,8 @@ builder.Services.AddEntityFrameworkSqlServer().AddDbContext<ApplicationDbContext
 });
 
 // Set up ASP.NET Core Identity as a Service 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+//builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddControllers();
 
@@ -28,6 +30,7 @@ builder.Services.AddAutoMapper(typeof(Mapping));
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.Configure<EmailSetting>(builder.Configuration.GetSection("EmailSetting"));
 builder.Services.AddTransient<IEmailTemplateService, EmailTemplateService>();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 

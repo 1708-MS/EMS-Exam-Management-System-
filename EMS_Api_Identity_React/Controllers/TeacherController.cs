@@ -1,10 +1,9 @@
-﻿using EMS_Api_Identity_React.Data;
+﻿using AutoMapper;
+using EMS_Api_Identity_React.Data;
 using EMS_Api_Identity_React.Models;
 using EMS_Api_Identity_React.Models.DTOs;
 using EMS_Api_Identity_React.Models.Identity;
 using EMS_Api_Identity_React.Utility;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -21,14 +20,17 @@ namespace EMS_Api_Identity_React.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationUser> _roleManager;
         private readonly ILogger<AccountController> _logger;
+        private readonly IMapper _mapper;
 
-        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, 
-            ILogger<AccountController> logger, RoleManager<ApplicationUser> roleManager)
+
+        public TeacherController(ApplicationDbContext context, UserManager<ApplicationUser> userManager,
+            ILogger<AccountController> logger, RoleManager<ApplicationUser> roleManager, IMapper mapper)
         {
             _userManager = userManager;
             _logger = logger;
             _context = context;
             _roleManager = roleManager;
+            _mapper = mapper;
         }
 
         // [Authorize(Roles = SD.Role_Admin)]
@@ -84,27 +86,26 @@ namespace EMS_Api_Identity_React.Controllers
             }
         }
 
-        //Get the details of all the Teachers from the database
         [HttpGet]
-        public IActionResult GetAllTeachers()
+        public async Task<IActionResult> GetAllTeachers()
         {
-            var teachers = _context.ApplicationUsers
-                        .Include(ApplicationUser => ApplicationUser.Subjects)
-                        .Include(ApplicationUser => ApplicationUser.ExamPapers)
-                        .Include(ApplicationUser => ApplicationUser.AnswerSheets)
-                        .Where(ApplicationUser => ApplicationUser.Role.Any(r => r.RoleId == _context.Roles.Single(role => role.Name == SD.Role_Teacher).Id))
-                        .Select(TeacherUser => new
-                        {
-                            TeacherUser.Id,
-                            TeacherUser.UserName,
-                            TeacherUser.Address,
-                            TeacherUser.PhoneNumber,
-                            Subjects = TeacherUser.Subjects.Select(s => s.SubjectName),
-                            ExamPapers = TeacherUser.ExamPapers.Select(ep => ep.Name),
-                            AnswerSheets = TeacherUser.AnswerSheets.Select(as => as.Score)
-                        }).ToList();
-            return Ok(teachers);
+            var teachers = await _userManager.GetUsersInRoleAsync(SD.Role_Teacher);
+            var teacherDtos = new List<TeacherDto>();
+            foreach (var teacher in teachers)
+            {
+                var subject = _context.Subjects.FirstOrDefault(s => s.SubjectId == teacher.Subjects.FirstOrDefault().SubjectId);
+                var subjectDto = _mapper.Map<SubjectDto>(subject);
+                var teacherDto = new TeacherDto
+                {
+                    Id = teacher.Id,
+                    UserName = teacher.UserName,
+                    ContactNumber = teacher.PhoneNumber,
+                    Address = teacher.Address,
+                    Subject = subjectDto
+                };
+                teacherDtos.Add(teacherDto);
+            }
+            return Ok(teacherDtos);
         }
     }
 }
-
