@@ -8,6 +8,7 @@ using EMS_Api_Identity_React.Services.Email_Service.Email_Interface;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,8 +19,13 @@ builder.Services.AddEntityFrameworkSqlServer().AddDbContext<ApplicationDbContext
 });
 
 // Set up ASP.NET Core Identity as a Service 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
-//builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+//builder.Services.AddScoped<IRoleStore<ApplicationRole>, ApplicationRoleStore>();
+//builder.Services.AddScoped<RoleManager<ApplicationRole>, ApplicationRoleManager>();
+//builder.Services.AddScoped<ApplicationRoleStore>();
 
 builder.Services.AddControllers();
 

@@ -1,4 +1,5 @@
 ﻿using EMS_Api_Identity_React.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace EMS_Api_Identity_React.Models.Identity

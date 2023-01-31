@@ -2,13 +2,12 @@
 {
     public class TeacherDto
     {
-        public string Id { get; set; }
-        public string UserName { get; set; }
-        public string Password { get; set; }
-        public string Address { get; set; }
-        public string ContactNumber { get; set; }
-        public SubjectDto Subject { get; set; }
-        public int SubjectId { get; set; }
+        public string TeacherId { get; set; }
+        public string TeacherUserName { get; set; }
+        public string TeacherPassword { get; set; }
+        public string TeacherAddress { get; set; }
+        public string TeacherContactNumber { get; set; }
+        public SubjectDto SubjectDto { get; set; }
     }
 
 }

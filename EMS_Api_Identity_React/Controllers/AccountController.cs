@@ -89,14 +89,14 @@ namespace EMS_Api_Identity_React.Controllers
                         {
                             await _userManager.AddToRoleAsync(applicationUser, SD.Role_Admin);
                         }
-                        else if (userSignUpDto.UserRole == SD.Role_Teacher)
-                        {
-                            await _userManager.AddToRoleAsync(applicationUser, SD.Role_Teacher);
-                        }
-                        else if (userSignUpDto.UserRole == "")
-                        {
-                            await _userManager.AddToRoleAsync(applicationUser, SD.Role_Student);
-                        }
+                        //else if (userSignUpDto.UserRole == SD.Role_Teacher)
+                        //{
+                        //    await _userManager.AddToRoleAsync(applicationUser, SD.Role_Teacher);
+                        //}
+                        //else if (userSignUpDto.UserRole == "")
+                        //{
+                        //    await _userManager.AddToRoleAsync(applicationUser, SD.Role_Student);
+                        //}
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(applicationUser);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                         var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = applicationUser.Id, code }, protocol: HttpContext.Request.Scheme);
