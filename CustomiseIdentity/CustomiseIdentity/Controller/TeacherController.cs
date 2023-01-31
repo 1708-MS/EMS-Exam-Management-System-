@@ -175,8 +175,8 @@ namespace CustomiseIdentity.Controller
         {
             //var teacherFromDb = await _userManager.FindByIdAsync(id);
             var teacherFromDb = await _context.ApplicationUsers
-                            .Include(t => t.Subjects)
-                            .FirstOrDefaultAsync(t => t.Id == id);
+                            .Include(ApplicationUser => ApplicationUser.Subjects)
+                            .FirstOrDefaultAsync(ApplicationUser => ApplicationUser.Id == id);
             if (teacherFromDb == null)
             {
                 return NotFound("Teacher not found");
@@ -209,5 +209,34 @@ namespace CustomiseIdentity.Controller
             return BadRequest("Update teacher failed");
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteTeacher(string id)
+        {
+            try
+            {
+                var teacher = await _userManager.FindByIdAsync(id);
+                if (teacher != null)
+                {
+                    var result = await _userManager.DeleteAsync(teacher);
+                    if (result.Succeeded)
+                    {
+                        return Ok();
+                    }
+                    else
+                    {
+                        return BadRequest("Error deleting teacher");
+                    }
+                }
+                else
+                {
+                    return NotFound("Teacher not found");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting a Teacher User.");
+                return StatusCode(500, "An error occurred while deleting a Teacher User. Please try again.");
+            }
+        }
     }
 }
