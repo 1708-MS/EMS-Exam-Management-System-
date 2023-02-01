@@ -1,8 +1,8 @@
 ﻿using CustomiseIdentity.Data;
-using CustomiseIdentity.Models.DTOs;
 using CustomiseIdentity.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using CustomiseIdentity.Models.DTOs.SubjectDto;
 
 namespace CustomiseIdentity.Controller
 {

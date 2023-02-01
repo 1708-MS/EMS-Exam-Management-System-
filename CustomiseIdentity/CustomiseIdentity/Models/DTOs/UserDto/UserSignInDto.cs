@@ -1,6 +1,4 @@
-﻿using EMS_Api_Identity_React.Models.Identity;
-
-namespace EMS_Api_Identity_React.Models.DTOs
+﻿namespace CustomiseIdentity.Models.DTOs.UserDto
 {
     public class UserSignInDto
     {

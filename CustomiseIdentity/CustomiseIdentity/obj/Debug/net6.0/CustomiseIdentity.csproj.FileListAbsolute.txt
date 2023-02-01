@@ -191,6 +191,7 @@ F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\Microsoft.OpenApi.dll
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\MimeKit.dll
+F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\Newtonsoft.Json.dll
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\BouncyCastle.Crypto.dll
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\Swashbuckle.AspNetCore.Swagger.dll
 F:\Coding\CS Tasks\Exam Management SystemAPI_.NetCore_ReactJS\CustomiseIdentity\CustomiseIdentity\bin\Debug\net6.0\Swashbuckle.AspNetCore.SwaggerGen.dll

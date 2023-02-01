@@ -1,4 +1,4 @@
-﻿namespace CustomiseIdentity.Models.DTOs
+﻿namespace CustomiseIdentity.Models.DTOs.TeacherDto
 {
     public class TeacherSignUpDto
     {
@@ -8,6 +8,5 @@
         public string TeacherAddress { get; set; }
         public string TeacherContactNumber { get; set; }
         public int SubjectId { get; set; }
-        public SubjectDto SubjectDto { get; set; }
     }
 }

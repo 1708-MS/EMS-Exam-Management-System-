@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using EMS_Api_Identity_React.Models;
 using EMS_Api_Identity_React.Models.DTOs;
+using EMS_Api_Identity_React.Models.DTOs.UserDto;
 using EMS_Api_Identity_React.Models.Identity;
 using System.Runtime;
 

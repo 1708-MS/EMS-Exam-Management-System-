@@ -1,4 +1,4 @@
-﻿namespace CustomiseIdentity.Models.DTOs
+﻿namespace CustomiseIdentity.Models.DTOs.TeacherDto
 {
     public class GetAllTeacherDto
     {
@@ -7,6 +7,6 @@
         public string TeacherAddress { get; set; }
         public string TeacherContactNumber { get; set; }
         public List<int> SubjectIds { get; set; }
-        public string SubjectName { get; set; }
+        public List<string> SubjectName { get; set; }
     }
 }

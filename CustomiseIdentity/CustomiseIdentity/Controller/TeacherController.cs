@@ -3,7 +3,7 @@ using CustomiseIdentity.Data;
 using CustomiseIdentity.Email.Email_Template;
 using CustomiseIdentity.Identity;
 using CustomiseIdentity.Models;
-using CustomiseIdentity.Models.DTOs;
+using CustomiseIdentity.Models.DTOs.TeacherDto;
 using CustomiseIdentity.Service.Email_Service.Email_Interface;
 using CustomiseIdentity.Utility;
 using Microsoft.AspNetCore.Authorization;
@@ -24,8 +24,6 @@ namespace CustomiseIdentity.Controller
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
-        private readonly IEmailTemplateService _emailTemplateService;
         private readonly ILogger<AccountController> _logger;
         private readonly ApplicationDbContext _context;
 
@@ -36,8 +34,6 @@ namespace CustomiseIdentity.Controller
             _userManager = userManager;
             _roleManager = roleManager;
             _signInManager = signInManager;
-            _emailSender = emailSender;
-            _emailTemplateService = emailTemplateService;
             _logger = logger;
             _context = context;
 
@@ -108,6 +104,36 @@ namespace CustomiseIdentity.Controller
             }
         }
 
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllTeachers()
+        //{
+        //    try
+        //    {
+        //        var teachers = await _userManager.GetUsersInRoleAsync(SD.Role_Teacher);
+
+        //        var teacherList = new List<GetAllTeacherDto>();
+        //        foreach (var teacher in teachers)
+        //        {
+        //            var getAllTeacherDto = new GetAllTeacherDto
+        //            {
+        //                TeacherId = teacher.Id,
+        //                TeacherUserName = teacher.UserName,
+        //                TeacherAddress = teacher.Address,
+        //                TeacherContactNumber = teacher.PhoneNumber,
+
+        //            };
+        //            teacherList.Add(getAllTeacherDto);
+        //        }
+        //        return Ok(teacherList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        var requestId = HttpContext.TraceIdentifier;
+        //        _logger.LogError($"RequestId: {requestId} - Error getting teachers. {ex}");
+        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error getting teachers");
+        //    }
+        //}
+
         [HttpGet]
         public async Task<IActionResult> GetAllTeachers()
         {
@@ -117,12 +143,18 @@ namespace CustomiseIdentity.Controller
                 var teacherList = new List<GetAllTeacherDto>();
                 foreach (var teacher in teachers)
                 {
+                    var subjects = await _context.Subjects.Where(Subject => Subject.ApplicationUser.Any(ApplicationUser => ApplicationUser.Id == teacher.Id)).ToListAsync();
+                    var subjectIds = subjects.Select(s => s.SubjectId).ToList();
+                    var subjectNames = subjects.Select(s => s.SubjectName).ToList();
+
                     var getAllTeacherDto = new GetAllTeacherDto
                     {
                         TeacherId = teacher.Id,
                         TeacherUserName = teacher.UserName,
                         TeacherAddress = teacher.Address,
-                        TeacherContactNumber = teacher.PhoneNumber
+                        TeacherContactNumber = teacher.PhoneNumber,
+                        SubjectIds = subjectIds,
+                        SubjectName = subjectNames
                     };
                     teacherList.Add(getAllTeacherDto);
                 }
@@ -135,8 +167,6 @@ namespace CustomiseIdentity.Controller
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error getting teachers");
             }
         }
-
-
 
 
         //[HttpPut("{id}")]

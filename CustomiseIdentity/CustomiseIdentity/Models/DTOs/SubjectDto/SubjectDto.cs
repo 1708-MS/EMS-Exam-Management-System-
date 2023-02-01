@@ -1,4 +1,4 @@
-﻿namespace CustomiseIdentity.Models.DTOs
+﻿namespace CustomiseIdentity.Models.DTOs.SubjectDto
 {
     public class SubjectDto
     {

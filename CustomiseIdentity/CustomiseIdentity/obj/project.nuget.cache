@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "j+B54uBSfZnOwdBcldUDw4Pcd98Sn388BqCZiIsUIWJwWiIYb8/SHrDnq8RxsBubjhB/xvHVS8yFQOO4BQyEOQ==",
+  "dgSpecHash": "fpD6A+Vv5k2xWLXRXs/Y01c5qAwaAdwfL0wWgv1zKOlukOVZ88D3M+waCdUC7p6dCaaOICzeZuEciKPbCHhUXA==",
   "success": true,
   "projectFilePath": "F:\\Coding\\CS Tasks\\Exam Management SystemAPI_.NetCore_ReactJS\\CustomiseIdentity\\CustomiseIdentity\\CustomiseIdentity.csproj",
   "expectedPackageFiles": [
@@ -41,6 +41,7 @@
     "C:\\Users\\manin\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\manin\\.nuget\\packages\\microsoft.win32.systemevents\\6.0.0\\microsoft.win32.systemevents.6.0.0.nupkg.sha512",
     "C:\\Users\\manin\\.nuget\\packages\\mimekit\\3.5.0\\mimekit.3.5.0.nupkg.sha512",
+    "C:\\Users\\manin\\.nuget\\packages\\newtonsoft.json\\13.0.2\\newtonsoft.json.13.0.2.nupkg.sha512",
     "C:\\Users\\manin\\.nuget\\packages\\portable.bouncycastle\\1.9.0\\portable.bouncycastle.1.9.0.nupkg.sha512",
     "C:\\Users\\manin\\.nuget\\packages\\swashbuckle.aspnetcore.swagger\\6.4.0\\swashbuckle.aspnetcore.swagger.6.4.0.nupkg.sha512",
     "C:\\Users\\manin\\.nuget\\packages\\swashbuckle.aspnetcore.swaggergen\\6.4.0\\swashbuckle.aspnetcore.swaggergen.6.4.0.nupkg.sha512",

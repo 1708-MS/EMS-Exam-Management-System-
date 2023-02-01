@@ -1,4 +1,4 @@
-﻿namespace EMS_Api_Identity_React.Models.DTOs
+﻿namespace EMS_Api_Identity_React.Models.DTOs.UserDto
 {
     public class UserSignUpDto
     {

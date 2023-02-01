@@ -1,7 +1,7 @@
 ﻿using CustomiseIdentity.Data;
 using CustomiseIdentity.Email.Email_Template;
 using CustomiseIdentity.Identity;
-using CustomiseIdentity.Models.DTOs;
+using CustomiseIdentity.Models.DTOs.UserDto;
 using CustomiseIdentity.Service.Email_Service.Email_Interface;
 using CustomiseIdentity.Utility;
 using Microsoft.AspNetCore.Http;

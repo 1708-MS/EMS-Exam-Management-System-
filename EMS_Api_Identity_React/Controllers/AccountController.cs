@@ -1,7 +1,7 @@
 ﻿using EMS_Api_Identity_React.Data;
 using EMS_Api_Identity_React.Email;
 using EMS_Api_Identity_React.Identity;
-using EMS_Api_Identity_React.Models.DTOs;
+using EMS_Api_Identity_React.Models.DTOs.UserDto;
 using EMS_Api_Identity_React.Models.Identity;
 using EMS_Api_Identity_React.Services.Email_Service.Email_Interface;
 using EMS_Api_Identity_React.Utility;
