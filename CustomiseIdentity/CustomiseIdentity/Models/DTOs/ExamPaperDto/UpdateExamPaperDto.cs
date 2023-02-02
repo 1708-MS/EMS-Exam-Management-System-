@@ -3,6 +3,6 @@
     public class UpdateExamPaperDto
     {
         public int ExamPaperId { get; set; }
-        public int SubjectId { get; set; }
+        public int? SubjectId { get; set; }
     }
 }

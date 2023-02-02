@@ -120,6 +120,15 @@ namespace CustomiseIdentity.Controller
                 _context.ExamPapers.Add(examPaper);
                 await _context.SaveChangesAsync();
 
+                var subjectinexam = _context.Subjects.FirstOrDefault(Subject => Subject.SubjectId == examPaper.SubjectId);
+                if (subjectinexam == null)
+                {
+                    return BadRequest();
+                }
+                subjectinexam.ExamPaperId = examPaper.ExamPaperId;
+                await _context.SaveChangesAsync();
+
+
                 return Ok(JsonConvert.SerializeObject((new { examPaperId = examPaper.ExamPaperId, subjectId=examPaper.SubjectId}), _jsonSettings));
             }
             catch (Exception ex)

@@ -2,8 +2,8 @@
 {
     public enum QuestionType
     {
-        ShortAnswer = 1,
-        LongAnswer = 2,
+        ShortAnswerQuestion = 1,
+        LongAnswerQuestion = 2,
         MCQs = 3
     }
 }
