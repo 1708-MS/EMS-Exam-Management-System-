@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using System.Configuration;
 using System.Reflection;
 using CustomiseIdentity.Email.Email_Template;
+using CustomiseIdentity.Repository.iRepository;
+using CustomiseIdentity.Repository;
 
 WebApplicationBuilder webApplicationBuilder = WebApplication.CreateBuilder(args);
 
@@ -30,6 +32,7 @@ webApplicationBuilder.Services.AddIdentity<ApplicationUser, ApplicationRole>().
     AddSignInManager<ApplicationSignInManager>().AddRoleStore<ApplicationRoleStore>().
     AddDefaultTokenProviders();
 webApplicationBuilder.Services.AddControllers();
+webApplicationBuilder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 webApplicationBuilder.Services.AddEndpointsApiExplorer();
 webApplicationBuilder.Services.AddSwaggerGen();
 webApplicationBuilder.Services.AddAutoMapper(typeof(Mapping));

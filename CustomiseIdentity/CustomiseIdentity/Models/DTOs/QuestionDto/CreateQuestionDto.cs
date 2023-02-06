@@ -15,6 +15,6 @@ namespace CustomiseIdentity.Models.DTOs.QuestionDto
     }
     public class MCQOptionDto
     {
-        public string MCQOption { get; set; }
+        public string MCQOptionsOfQuestion { get; set; }
     }
 }

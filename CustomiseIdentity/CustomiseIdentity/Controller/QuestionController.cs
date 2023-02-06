@@ -28,7 +28,7 @@ namespace CustomiseIdentity.Controller
         [HttpPost]
         public async Task<ActionResult<Question>> CreateQuestion([FromBody] CreateQuestionDto createQuestionDto)
         {
-            if (createQuestionDto.QuestionType == QuestionType.ShortAnswerQuestion && createQuestionDto.QuestionType == QuestionType.LongAnswerQuestion)
+            if (createQuestionDto.QuestionType == QuestionType.ShortAnswerQuestion || createQuestionDto.QuestionType == QuestionType.LongAnswerQuestion)
             {
                 if (createQuestionDto.ExamPaperId == null)
                 {
@@ -52,20 +52,13 @@ namespace CustomiseIdentity.Controller
             {
                 if (createQuestionDto.QuestionType == QuestionType.MCQs)
                 {
-                    if (createQuestionDto.ExamPaperId == null)
-                    {
-                        return BadRequest("ExamPaperId cannot be null, please select an exam paper");
-                    }
+                    if (createQuestionDto.ExamPaperId == null) return BadRequest("ExamPaperId cannot be null, please select an exam paper");
 
-                    if (createQuestionDto.MCQOptions == null || !createQuestionDto.MCQOptions.Any())
-                    {
-                        return BadRequest("MCQOptions cannot be null, please provide at least one option");
-                    }
+                    if (createQuestionDto.MCQOptions == null || !createQuestionDto.MCQOptions.Any()) return BadRequest("MCQOptions cannot be null, please provide at least one option");
+
                     var examPaperFromDb = await _context.ExamPapers.FindAsync(createQuestionDto.ExamPaperId);
-                    if (examPaperFromDb == null)
-                    {
-                        return BadRequest("Invalid ExamPaperId, please select a valid exam paper");
-                    }
+
+                    if (examPaperFromDb == null) return BadRequest("Invalid ExamPaperId, please select a valid exam paper");
 
                     var question = new Question
                     {
@@ -77,14 +70,14 @@ namespace CustomiseIdentity.Controller
 
                     var mcqOptions = createQuestionDto.MCQOptions.Select(option => new MCQOption
                     {
-                        SubmittedAnswerOfMCQ = option.MCQOption,
+                        MCQOptionsOfQuestion = option.MCQOptionsOfQuestion,
                         Question = question
                     }).ToList();
+
                     if (mcqOptions.Count > 1)
                     {
                         question.MCQOptions = mcqOptions;
                         _context.Questions.Add(question);
-
                         await _context.SaveChangesAsync();
                         return Ok();
                     }
@@ -93,5 +86,38 @@ namespace CustomiseIdentity.Controller
             }
             return BadRequest("Invalid QuestionType, please select a valid QuestionType: ShortAnswerQuestion = 1, LongAnswerQuestion = 2, MCQs = 3");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllQuestions()
+        {
+            try
+            {
+                //var questions = await _context.Questions.ToListAsync();
+                var questions = await _context.Questions.Include(Question => Question.MCQOptions).ToListAsync();
+                if (questions == null) return NotFound("No questions found");
+                var questionList = new List<GetAllQuestionsDto>();
+
+                foreach (var question in questions)
+                {
+                    var getAllQuestionDto = new GetAllQuestionsDto
+                    {
+                        QuestionId = question.QuestionId,
+                        QuestionText = question.QuestionText,
+                        QuestionMarks = question.QuestionMarks,
+                        ExamPaperId = question.ExamPaperId,
+                        AnswerId = question.AnswerId,
+                        QuestionType = question.QuestionType
+                    };
+                    questionList.Add(getAllQuestionDto);
+                }
+                return Ok(questionList);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+            }
+        }
+
+
     }
 }

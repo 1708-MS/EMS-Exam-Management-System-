@@ -40,7 +40,8 @@ namespace CustomiseIdentity.Controller
         {
             try
             {
-                var examPapers = await _context.ExamPapers.ToListAsync();
+                var examPapers = await _context.ExamPapers.Include(ExamPaper => ExamPaper.Questions).Include(ExamPaper=>ExamPaper.ApplicationUsers).ToListAsync();
+                //var examPapers = await _context.ExamPapers.ToListAsync();
                 if (examPapers == null)
                 {
                     return NotFound("No exam papers found");
@@ -53,8 +54,8 @@ namespace CustomiseIdentity.Controller
                     {
                         ExamPaperId = examPaper.ExamPaperId,
                         SubjectId = examPaper.SubjectId,
-                        //ApplicationUserId = examPaper.ApplicationUsers.Select(ApplicationUser => ApplicationUser.Id).ToList(),
-                        //QuestionId = examPaper.Questions.Select(Question => Question.QuestionId).ToList(),
+                        Questions = examPaper.Questions.ToList(),
+                        ApplicationUserId = examPaper.ApplicationUsers.Select(ApplicationUser => ApplicationUser.Id).ToList(),
                         //AnswerSheetId = examPaper.AnswerSheets.Select(AnswerSheet => AnswerSheet.AnswerSheetId).ToList(),
                     };
                     examPaperList.Add(getAllExamPaperDto);
@@ -120,16 +121,16 @@ namespace CustomiseIdentity.Controller
                 _context.ExamPapers.Add(examPaper);
                 await _context.SaveChangesAsync();
 
-                var subjectinexam = _context.Subjects.FirstOrDefault(Subject => Subject.SubjectId == examPaper.SubjectId);
-                if (subjectinexam == null)
+                var subjectInExam = _context.Subjects.FirstOrDefault(Subject => Subject.SubjectId == examPaper.SubjectId);
+                if (subjectInExam == null)
                 {
                     return BadRequest();
                 }
-                subjectinexam.ExamPaperId = examPaper.ExamPaperId;
+                subjectInExam.ExamPaperId = examPaper.ExamPaperId;
                 await _context.SaveChangesAsync();
 
 
-                return Ok(JsonConvert.SerializeObject((new { examPaperId = examPaper.ExamPaperId, subjectId=examPaper.SubjectId}), _jsonSettings));
+                return Ok(JsonConvert.SerializeObject((new { examPaperId = examPaper.ExamPaperId, subjectId = examPaper.SubjectId }), _jsonSettings));
             }
             catch (Exception ex)
             {
@@ -173,7 +174,7 @@ namespace CustomiseIdentity.Controller
             {
                 return NotFound($"Exam paper with Id {id} does not exist");
             }
-            
+
             examPaper.SubjectId = updateExamPaperDto.SubjectId;
             if (examPaper.SubjectId == 0)
             {

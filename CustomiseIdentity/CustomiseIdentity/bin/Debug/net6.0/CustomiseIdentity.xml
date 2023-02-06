@@ -4,5 +4,13 @@
         <name>CustomiseIdentity</name>
     </assembly>
     <members>
+        <member name="M:CustomiseIdentity.Controller.SubController.AddSubject(CustomiseIdentity.Models.DTOs.SubjectDto.SubjectDto)">
+            <summary>
+                   //Add Subjects only to the database
+            </summary>
+            <param name="subjectDto">            </param>
+            <returns></returns>
+            
+        </member>
     </members>
 </doc>

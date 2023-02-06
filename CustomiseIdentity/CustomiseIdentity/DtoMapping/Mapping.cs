@@ -15,14 +15,14 @@ namespace CustomiseIdentity.DtoMapping
         {
             CreateMap<ApplicationUser, UserSignInDto>().ReverseMap();
             CreateMap<ApplicationUser, UserSignUpDto>().ReverseMap();
-            CreateMap<ApplicationUser, SubjectDto>().ReverseMap();
+            CreateMap<Subject, SubjectDto>().ReverseMap();
             CreateMap<ApplicationUser, TeacherSignUpDto>().ReverseMap();
             CreateMap<ApplicationUser, GetAllTeacherDto>().ReverseMap();
             CreateMap<ApplicationUser, GetAllExamPaperDto>().ReverseMap();
             CreateMap<ApplicationUser, CreateExamPaperDto>().ReverseMap();
             CreateMap<ApplicationUser, UpdateExamPaperDto>().ReverseMap();
             CreateMap<ApplicationUser, CreateQuestionDto>().ReverseMap();
-
+            CreateMap<ApplicationUser, GetAllQuestionsDto>().ReverseMap();
         }
     }
 }

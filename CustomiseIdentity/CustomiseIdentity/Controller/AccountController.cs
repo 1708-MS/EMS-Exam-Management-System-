@@ -19,9 +19,6 @@ namespace CustomiseIdentity.Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<ApplicationRole> _roleManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly IEmailSender _emailSender;
-        private readonly IEmailTemplateService _emailTemplateService;
         private readonly ILogger<AccountController> _logger;
         private readonly ApplicationDbContext _context;
         public AccountController(UserManager<ApplicationUser> userManager, RoleManager<ApplicationRole> roleManager,
@@ -30,9 +27,6 @@ namespace CustomiseIdentity.Controller
         {
             _userManager = userManager;
             _roleManager = roleManager;
-            _signInManager = signInManager;
-            _emailSender = emailSender;
-            _emailTemplateService = emailTemplateService;
             _logger = logger;
             _context = context;
         }
@@ -105,15 +99,7 @@ namespace CustomiseIdentity.Controller
                         //await _emailSender.SendEmailAsync(userSignUpDto.UserEmail, subject, messageBody);
                         return Ok(new { message = "New Admin User created successfully." });
                     }
-                    switch (result.Errors)
-                    {
-                        case IdentityError e when e.Code == "DuplicateUserName":
-                            return BadRequest("UserName already taken");
-                        case IdentityError e when e.Code == "InvalidEmail":
-                            return BadRequest("Invalid email address");
-                        default:
-                            return BadRequest("Error creating user");
-                    }
+                    return BadRequest("Error creating user");
                 }
                 else
                 {
@@ -122,8 +108,6 @@ namespace CustomiseIdentity.Controller
             }
             catch (Exception ex)
             {
-                //_logger.LogError($"Error creating a new Admin User: {ex}");
-                //return BadRequest(new { message = "An error occurred while creating a new Admin User." });
                 var requestId = HttpContext.TraceIdentifier;
                 _logger.LogError($"RequestId: {requestId} - Error creating user. {ex}");
                 return StatusCode(StatusCodes.Status500InternalServerError, "Error creating user");

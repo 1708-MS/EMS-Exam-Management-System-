@@ -1,154 +1,91 @@
-﻿using CustomiseIdentity.Data;
+﻿using AutoMapper;
 using CustomiseIdentity.Models;
+using CustomiseIdentity.Models.DTOs.SubjectDto;
+using CustomiseIdentity.Repository.iRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using CustomiseIdentity.Models.DTOs.SubjectDto;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CustomiseIdentity.Controller
 {
-    [Route("api/subject")]
+    [Route("api/subjects")]
     [ApiController]
     public class SubjectController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ISubjectRepository _subjectRepository;
+        private readonly IMapper _mapper;
         private readonly ILogger<AccountController> _logger;
-        public SubjectController(ApplicationDbContext context, ILogger<AccountController> logger)
+        public SubjectController(ISubjectRepository subjectRepository, IMapper mapper, ILogger<AccountController> logger)
         {
-            _context = context;
+            _subjectRepository = subjectRepository;
+            _mapper = mapper;
             _logger = logger;
         }
 
-        //Add Subjects only to the database
+        // Retreive All Subjects and its details from the database
+        [HttpGet]
+        public ActionResult<IEnumerable<SubjectDto>> GetAllSubjects()
+        {
+            var subjects = _subjectRepository.GetAllSubjects();
+            var subjectDtos = _mapper.Map<IEnumerable<SubjectDto>>(subjects);
+            return Ok(subjectDtos);
+        }
+
+        // Retreive the specific Subject and its details from the database through SubjectId
+        [HttpGet("{subjectId}")]
+        public ActionResult<SubjectDto> GetSubjectById(int subjectId)
+        {
+            var subject = _subjectRepository.GetSubjectById(subjectId);
+            if (subject == null)
+            {
+                return NotFound();
+            }
+            var subjectDto = _mapper.Map<SubjectDto>(subject);
+            return Ok(subjectDto);
+        }
+
+        // Save the Subject details in the database
         [HttpPost]
         public IActionResult AddSubject([FromBody] SubjectDto subjectDto)
         {
-            try
-            {
-                if (subjectDto.ExamPaperId == -1)
-                {
-                    var subject = new Subject
-                    {
-                        SubjectName = subjectDto.SubjectName,
-                        ExamPaperId = null,
-                    };
-                    _context.Subjects.Add(subject);
-                    _context.SaveChanges();
-                    return Ok();
-                }
-                else if (_context.ExamPapers.Any(ep => ep.ExamPaperId == subjectDto.ExamPaperId))
-                {
-                    var subject = new Subject
-                    {
-                        SubjectName = subjectDto.SubjectName,
-                        ExamPaperId = subjectDto.ExamPaperId,
-                    };
-                    _context.Subjects.Add(subject);
-                    _context.SaveChanges();
-                    return Ok();
-                }
-                else
-                {
-                    return BadRequest("Invalid ExamPaperId");
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while adding new subject.");
-                return StatusCode(500, "An error occurred while adding new the subject. Please try again.");
-                // return StatusCode(500, "An error occurred while adding a new subject. Please try again later.");
-            }
+
+             _subjectRepository.AddSubject(subjectDto);
+            return Ok(subjectDto);
         }
 
-        [HttpGet]
-        public IActionResult GetAllSubjects()
-        {
-            try
-            {
-                // Retrieve all subjects from the database
-                var subjects = _context.Subjects.ToList();
 
-                // Return the subjects
-                return Ok(subjects);
-            }
-            catch (Exception ex)
+
+        // Edit and Update the details of the Subject which are already saved in the database
+        [HttpPut("{subjectId}")]
+        public IActionResult UpdateSubject(int subjectId, SubjectDto subjectDto)
+        {
+            var subject = _mapper.Map<Subject>(subjectDto);
+            subject.SubjectId = subjectId;
+
+            if (!_subjectRepository.SubjectExists(subjectId))
             {
-                _logger.LogError(ex, "An error occurred while retrieving subjects.");
-                return StatusCode(500, "An error occurred while retrieving subjects. Please try again.");
+                return NotFound();
             }
+
+            _subjectRepository.UpdateSubject(subject);
+            _subjectRepository.Save();
+            return Ok(subjectDto);
         }
 
-        //Get the full details of the specific Subjects through Id
-        [HttpGet("{id}")]
-        public IActionResult GetSubjectById(int id)
+        // Delete the full details of the subject from the database
+        [HttpDelete("{subjectId}")]
+        public IActionResult DeleteSubject(int subjectId)
         {
-            try
+            if (!_subjectRepository.SubjectExists(subjectId))
             {
-                // Retrieve the subject by its id
-                var subject = _context.Subjects.Find(id);
-
-                if (subject == null)
-                {
-                    return NotFound("Subject not found");
-                }
-
-                // Return the subject
-                return Ok(subject);
+                return NotFound();
             }
-            catch (Exception ex)
-            {
-                // Log the exception
-                _logger.LogError(ex, "An error occurred while retrieving subject by id.");
 
-                // Return a generic error message
-                return StatusCode(500, "An error occurred while retrieving subject by id. Please try again.");
-            }
-        }
-
-        [HttpPut("{id}")]
-        public IActionResult UpdateSubject(int id, [FromBody] UpdateSubjectDto updateSubjectDto)
-        {
-            try
-            {
-                var subject = _context.Subjects.Find(id);
-
-                if (subject == null)
-                {
-                    return NotFound("Subject not found");
-                }
-
-                // Update the subject properties
-                subject.SubjectName = updateSubjectDto.SubjectName;
-                _context.SaveChanges();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while updating the subject.");
-                return StatusCode(500, "An error occurred while updating the subject. Please try again.");
-            }
-        }
-
-        //Delete the selected Subject in the database
-        [HttpDelete("{id}")]
-        public IActionResult DeleteSubject(int id)
-        {
-            try
-            {
-                var subject = _context.Subjects.Find(id);
-
-                if (subject == null)
-                {
-                    return NotFound("Subject not found");
-                }
-                _context.Subjects.Remove(subject);
-                _context.SaveChanges();
-                return Ok();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while deleting the subject.");
-                return StatusCode(500, "An error occurred while deleting the subject. Please try again  .");
-            }
+            _subjectRepository.DeleteSubject(subjectId);
+            _subjectRepository.Save();
+            return Ok();
         }
     }
 }

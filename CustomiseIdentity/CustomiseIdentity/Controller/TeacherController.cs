@@ -104,36 +104,6 @@ namespace CustomiseIdentity.Controller
             }
         }
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllTeachers()
-        //{
-        //    try
-        //    {
-        //        var teachers = await _userManager.GetUsersInRoleAsync(SD.Role_Teacher);
-
-        //        var teacherList = new List<GetAllTeacherDto>();
-        //        foreach (var teacher in teachers)
-        //        {
-        //            var getAllTeacherDto = new GetAllTeacherDto
-        //            {
-        //                TeacherId = teacher.Id,
-        //                TeacherUserName = teacher.UserName,
-        //                TeacherAddress = teacher.Address,
-        //                TeacherContactNumber = teacher.PhoneNumber,
-
-        //            };
-        //            teacherList.Add(getAllTeacherDto);
-        //        }
-        //        return Ok(teacherList);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var requestId = HttpContext.TraceIdentifier;
-        //        _logger.LogError($"RequestId: {requestId} - Error getting teachers. {ex}");
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error getting teachers");
-        //    }
-        //}
-
         [HttpGet]
         public async Task<IActionResult> GetAllTeachers()
         {
@@ -144,8 +114,8 @@ namespace CustomiseIdentity.Controller
                 foreach (var teacher in teachers)
                 {
                     var subjects = await _context.Subjects.Where(Subject => Subject.ApplicationUser.Any(ApplicationUser => ApplicationUser.Id == teacher.Id)).ToListAsync();
-                    var subjectIds = subjects.Select(s => s.SubjectId).ToList();
-                    var subjectNames = subjects.Select(s => s.SubjectName).ToList();
+                    var subjectIds = subjects.Select(Subject => Subject.SubjectId).ToList();
+                    var subjectNames = subjects.Select(Subject => Subject.SubjectName).ToList();
 
                     var getAllTeacherDto = new GetAllTeacherDto
                     {
@@ -168,37 +138,6 @@ namespace CustomiseIdentity.Controller
             }
         }
 
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> UpdateTeacher(string id, UpdateTeacherDto updateTeacherDto)
-        //{
-        //    try
-        //    {
-        //        var teacherFromDb = await _userManager.FindByIdAsync(id);
-        //        if (teacherFromDb == null)
-        //        {
-        //            return BadRequest("Teacher not found");
-        //        }
-        //        teacherFromDb.UserName = updateTeacherDto.TeacherUserName;
-        //        teacherFromDb.Address = updateTeacherDto.TeacherAddress;
-        //        teacherFromDb.PhoneNumber = updateTeacherDto.TeacherContactNumber;
-
-        //        var result = await _userManager.UpdateAsync(teacherFromDb);
-        //        if (result.Succeeded)
-        //        {
-        //            return Ok("Teacher updated successfully");
-        //        }
-
-
-        //        return BadRequest("Error updating teacher");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var requestId = HttpContext.TraceIdentifier;
-        //        _logger.LogError($"RequestId: {requestId} - Error updating teacher. {ex}");
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error updating teacher");
-        //    }
-        //}
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTeacher(string id, UpdateTeacherDto updateTeacherDto)
