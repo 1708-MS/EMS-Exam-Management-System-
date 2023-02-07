@@ -2,6 +2,8 @@
 using CustomiseIdentity.Migrations;
 using CustomiseIdentity.Repository.iRepository;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
+using System.Text;
 
 namespace CustomiseIdentity.Repository
 {
@@ -15,29 +17,78 @@ namespace CustomiseIdentity.Repository
             dbSet = _context.Set<T>();
         }
 
-        public void Create(T entity)
+        public void Add(T entity)
         {
             dbSet.Add(entity);
         }
 
-        public void Delete(T entity)
+        public T FirstOrDefault(Expression<Func<T, bool>> filter = null, string includeProperties = null)
         {
-            dbSet.Remove(entity);
+            IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            if (includeProperties != null)
+            {
+                foreach (var includeProp in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeProp);
+                }
+            }
+            return query.FirstOrDefault();
         }
 
-        public IQueryable<T> GetAll()
+        public IEnumerable<T> GetAll(Expression<Func<T, bool>> filter = null, Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null, string includeProperties = null)
         {
-            return dbSet.AsNoTracking();
+            IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            if (includeProperties != null)
+            {
+                foreach (var includeprop in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(includeprop);
+                }
+            }
+            if (orderBy != null)
+            {
+                return orderBy(query).ToList();
+            }
+            return query.ToList();
         }
 
-        public T GetById(int id)
+        public T Get(int id)
         {
             return dbSet.Find(id);
         }
 
-        public void Update(T entity)
+        public void Remove(T entity)
         {
-            dbSet.Update(entity);
+            dbSet.Remove(entity);
+        }
+
+        public void Remove(int id)
+        {
+            var entity = Get(id);
+            Remove(entity);
+        }
+
+        public void RemoveRange(IEnumerable<T> entity)
+        {
+            dbSet.RemoveRange(entity);
+        }
+
+        public bool Exists(Expression<Func<T, bool>> filter)
+        {
+            return dbSet.Any(filter);
+        }
+
+        public bool Save()
+        {
+            return _context.SaveChanges() == 1 ? true : false;
         }
     }
 }

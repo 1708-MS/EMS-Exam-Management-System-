@@ -5,5 +5,6 @@ namespace CustomiseIdentity.Repository.iRepository
 {
     public interface ISubjectRepository : IRepository<Subject>
     {
+        void Update(Subject subject);
     }
 }

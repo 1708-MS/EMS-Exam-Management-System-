@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CustomiseIdentity.Models;
 using CustomiseIdentity.Models.DTOs.SubjectDto;
+using CustomiseIdentity.Repository;
 using CustomiseIdentity.Repository.iRepository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,78 +15,94 @@ namespace CustomiseIdentity.Controller
     [ApiController]
     public class SubjectController : ControllerBase
     {
-        private readonly ISubjectRepository _subjectRepository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<AccountController> _logger;
-        public SubjectController(ISubjectRepository subjectRepository, IMapper mapper, ILogger<AccountController> logger)
+        public SubjectController(IUnitOfWork unitOfWork, IMapper mapper)
         {
-            _subjectRepository = subjectRepository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
-            _logger = logger;
         }
 
-        // Retreive All Subjects and its details from the database
+        // GetSubjects methods retreives all Subjects and its details from the database
         [HttpGet]
-        public ActionResult<IEnumerable<SubjectDto>> GetAllSubjects()
+        public ActionResult GetSubjects()
         {
-            var subjects = _subjectRepository.GetAllSubjects();
-            var subjectDtos = _mapper.Map<IEnumerable<SubjectDto>>(subjects);
-            return Ok(subjectDtos);
+           if(ModelState.IsValid)
+            {
+                //var subjects = _unitOfWork.Subject.GetAll().Select(_mapper.Map<Subject, GetSubjectDto>);
+                //return Ok(subjects);
+                var subjects = _unitOfWork.Subject.GetAll();
+                var getSubjectsDto = _mapper.Map<IEnumerable<GetSubjectDto>>(subjects);
+                return Ok(getSubjectsDto);
+            }
+            return BadRequest();
+
         }
 
-        // Retreive the specific Subject and its details from the database through SubjectId
-        [HttpGet("{subjectId}")]
-        public ActionResult<SubjectDto> GetSubjectById(int subjectId)
+        // GetSubject retreives specific Subjects through Id and its details from the database
+        [HttpGet("{id}")]
+        public ActionResult GetSubject(int id)
         {
-            var subject = _subjectRepository.GetSubjectById(subjectId);
-            if (subject == null)
+            if (ModelState.IsValid)
             {
+                var subject = _unitOfWork.Subject.Get(id);
+                if (subject != null)
+                {
+                    var subjectDto = _mapper.Map<AddSubjectDto>(subject);
+                    return Ok(subjectDto);
+                }
                 return NotFound();
             }
-            var subjectDto = _mapper.Map<SubjectDto>(subject);
-            return Ok(subjectDto);
+            return BadRequest();
+
         }
 
-        // Save the Subject details in the database
-        [HttpPost]
-        public IActionResult AddSubject([FromBody] SubjectDto subjectDto)
+        public ActionResult AddSubject([FromBody] AddSubjectDto addSubjectDto)
         {
+            if (addSubjectDto == null)
+                return BadRequest(ModelState);  //400
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            var subject = _mapper.Map<AddSubjectDto, Subject>(addSubjectDto);
 
-             _subjectRepository.AddSubject(subjectDto);
-            return Ok(subjectDto);
-        }
-
-
-
-        // Edit and Update the details of the Subject which are already saved in the database
-        [HttpPut("{subjectId}")]
-        public IActionResult UpdateSubject(int subjectId, SubjectDto subjectDto)
-        {
-            var subject = _mapper.Map<Subject>(subjectDto);
-            subject.SubjectId = subjectId;
-
-            if (!_subjectRepository.SubjectExists(subjectId))
+            if (_unitOfWork.Subject.Exists(s => s.SubjectName == subject.SubjectName))
             {
+                return BadRequest("A subject with the same name already exists.");
+            }
+            _unitOfWork.Subject.Add(subject);
+            return Ok(subject);
+        }
+
+        // UpdateSubject edit and 
+        [HttpPut("{id}")]
+        public ActionResult UpdateSubject(int id, UpdateSubjectDto updateSubjectDto)
+        {
+            if (ModelState.IsValid)
+            {
+                var subject = _unitOfWork.Subject.Get(id);
+                if (subject != null)
+                {
+                    _mapper.Map(updateSubjectDto, subject);
+                    _unitOfWork.Subject.Update(subject);
+                    return Ok(updateSubjectDto);
+                }
+            }
+            return NotFound();
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult DeleteSubject(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                var subject = _unitOfWork.Subject.Get(id);
+                if (subject != null)
+                {
+                    _unitOfWork.Subject.Remove(subject);
+                    return Ok();
+                }
                 return NotFound();
             }
-
-            _subjectRepository.UpdateSubject(subject);
-            _subjectRepository.Save();
-            return Ok(subjectDto);
-        }
-
-        // Delete the full details of the subject from the database
-        [HttpDelete("{subjectId}")]
-        public IActionResult DeleteSubject(int subjectId)
-        {
-            if (!_subjectRepository.SubjectExists(subjectId))
-            {
-                return NotFound();
-            }
-
-            _subjectRepository.DeleteSubject(subjectId);
-            _subjectRepository.Save();
-            return Ok();
+            return BadRequest();
         }
     }
 }

@@ -3,5 +3,6 @@
     public interface IUnitOfWork
     {
         ISubjectRepository Subject { get; }
+        IExamPaperRepository ExamPaper { get; }
     }
 }

@@ -15,7 +15,8 @@ namespace CustomiseIdentity.DtoMapping
         {
             CreateMap<ApplicationUser, UserSignInDto>().ReverseMap();
             CreateMap<ApplicationUser, UserSignUpDto>().ReverseMap();
-            CreateMap<Subject, SubjectDto>().ReverseMap();
+            CreateMap<Subject, GetSubjectDto>().ReverseMap();
+            CreateMap<Subject, AddSubjectDto>().ReverseMap();
             CreateMap<ApplicationUser, TeacherSignUpDto>().ReverseMap();
             CreateMap<ApplicationUser, GetAllTeacherDto>().ReverseMap();
             CreateMap<ApplicationUser, GetAllExamPaperDto>().ReverseMap();

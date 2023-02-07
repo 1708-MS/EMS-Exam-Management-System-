@@ -1,4 +1,5 @@
-﻿using CustomiseIdentity.Data;
+﻿using AutoMapper;
+using CustomiseIdentity.Data;
 using CustomiseIdentity.Repository.iRepository;
 
 namespace CustomiseIdentity.Repository
@@ -10,8 +11,11 @@ namespace CustomiseIdentity.Repository
         {
             _context = context;
             Subject = new SubjectRepository(_context);
+            ExamPaper = new ExamPaperRepository(_context);
         }
 
         public ISubjectRepository Subject { get; private set; }
+
+        public IExamPaperRepository ExamPaper { get; private set; }
     }
 }
