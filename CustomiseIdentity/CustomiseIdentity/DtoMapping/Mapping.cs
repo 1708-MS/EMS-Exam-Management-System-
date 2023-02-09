@@ -15,15 +15,25 @@ namespace CustomiseIdentity.DtoMapping
         {
             CreateMap<ApplicationUser, UserSignInDto>().ReverseMap();
             CreateMap<ApplicationUser, UserSignUpDto>().ReverseMap();
-            CreateMap<Subject, GetSubjectDto>().ReverseMap();
-            CreateMap<Subject, AddSubjectDto>().ReverseMap();
+
             CreateMap<ApplicationUser, TeacherSignUpDto>().ReverseMap();
             CreateMap<ApplicationUser, GetAllTeacherDto>().ReverseMap();
-            CreateMap<ApplicationUser, GetAllExamPaperDto>().ReverseMap();
-            CreateMap<ApplicationUser, CreateExamPaperDto>().ReverseMap();
-            CreateMap<ApplicationUser, UpdateExamPaperDto>().ReverseMap();
-            CreateMap<ApplicationUser, CreateQuestionDto>().ReverseMap();
-            CreateMap<ApplicationUser, GetAllQuestionsDto>().ReverseMap();
+
+            // This is for Subject model
+            CreateMap<Subject, GetSubjectDto>().ReverseMap();
+            CreateMap<Subject, AddSubjectDto>().ReverseMap();
+            CreateMap<Subject, UpdateSubjectDto>().ReverseMap();
+
+            //This is for Exam model
+            CreateMap<ExamPaper, CreateExamPaperDto>().ReverseMap();
+            CreateMap<ExamPaper, GetExamPaperDto>().ReverseMap();
+            CreateMap<ExamPaper, UpdateExamPaperDto>().ReverseMap();
+
+            // This is for Question model
+            CreateMap<Question, CreateQuestionDto>().ReverseMap();
+            CreateMap<MCQOption, MCQOptionDto>().ReverseMap();
+            CreateMap<Question, GetQuestionsDto>().ReverseMap();
+
         }
     }
 }

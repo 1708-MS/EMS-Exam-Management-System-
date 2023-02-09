@@ -19,6 +19,7 @@ namespace CustomiseIdentity.Controller
 
     [Route("api/Teacher")]
     [ApiController]
+    
     public class TeacherController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
@@ -70,6 +71,7 @@ namespace CustomiseIdentity.Controller
                         {
                             await _userManager.AddToRoleAsync(applicationUser, SD.Role_Teacher);
                         }
+                        
                         var subject = await _context.Subjects.FindAsync(teacherSignUpDto.SubjectId);
                         if (subject != null)
                         {

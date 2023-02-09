@@ -14,11 +14,11 @@ namespace CustomiseIdentity.Repository.iRepository
             String includeProperties = null
             );
         T Get(int id);
+
         void Add(T entity);
         void Remove(T entity);
         void Remove(int Id);
         void RemoveRange(IEnumerable<T> entity);
-        bool Exists(Expression<Func<T, bool>> filter);
-        bool Save();
+        bool Contains(Expression<Func<T, bool>> filter = null);
     }
 }

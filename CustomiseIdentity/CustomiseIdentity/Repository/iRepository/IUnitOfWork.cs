@@ -4,5 +4,7 @@
     {
         ISubjectRepository Subject { get; }
         IExamPaperRepository ExamPaper { get; }
+        IQuestionRepository Question { get; }
+        void Save();
     }
 }

@@ -4,6 +4,7 @@ using CustomiseIdentity.Repository.iRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CustomiseIdentity.Repository
 {
@@ -63,6 +64,7 @@ namespace CustomiseIdentity.Repository
         public T Get(int id)
         {
             return dbSet.Find(id);
+           
         }
 
         public void Remove(T entity)
@@ -72,7 +74,8 @@ namespace CustomiseIdentity.Repository
 
         public void Remove(int id)
         {
-            var entity = Get(id);
+            var entity = dbSet.Find(id);
+            
             Remove(entity);
         }
 
@@ -81,14 +84,14 @@ namespace CustomiseIdentity.Repository
             dbSet.RemoveRange(entity);
         }
 
-        public bool Exists(Expression<Func<T, bool>> filter)
+        public bool Contains(Expression<Func<T, bool>> filter =null)
         {
-            return dbSet.Any(filter);
-        }
-
-        public bool Save()
-        {
-            return _context.SaveChanges() == 1 ? true : false;
+            IQueryable<T> query = dbSet;
+            if (filter != null)
+            {
+                query = query.Where(filter);
+            }
+            return query.Any();
         }
     }
 }

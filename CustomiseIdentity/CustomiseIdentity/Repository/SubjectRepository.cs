@@ -11,8 +11,7 @@ namespace CustomiseIdentity.Repository
         private readonly ApplicationDbContext _context;
         public SubjectRepository(ApplicationDbContext context) : base(context)
         {
-            _context = context;
-         
+            _context = context;  
         }
 
         public void Update(Subject subject)

@@ -31,7 +31,7 @@ webApplicationBuilder.Services.AddIdentity<ApplicationUser, ApplicationRole>().
     AddUserManager<ApplicationUserManager>().AddRoleManager<ApplicationRoleManager>().
     AddSignInManager<ApplicationSignInManager>().AddRoleStore<ApplicationRoleStore>().
     AddDefaultTokenProviders();
-webApplicationBuilder.Services.AddAutoMapper(typeof(Program));
+//webApplicationBuilder.Services.AddAutoMapper(typeof(Program));
 webApplicationBuilder.Services.AddAutoMapper(typeof(Mapping));
 webApplicationBuilder.Services.AddControllers();
 webApplicationBuilder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

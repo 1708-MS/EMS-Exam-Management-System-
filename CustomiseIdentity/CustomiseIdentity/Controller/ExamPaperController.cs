@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
 using CustomiseIdentity.Data;
-using CustomiseIdentity.Identity;
 using CustomiseIdentity.Models;
 using CustomiseIdentity.Models.DTOs.ExamPaperDto;
-using CustomiseIdentity.Models.DTOs.TeacherDto;
+using CustomiseIdentity.Repository;
 using CustomiseIdentity.Repository.iRepository;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Newtonsoft.Json;
-using System.Text.Json;
-using System.Threading.Channels;
 
 namespace CustomiseIdentity.Controller
 {
@@ -35,198 +29,78 @@ namespace CustomiseIdentity.Controller
             _mapper = mapper;
         }
 
+        // This method create and save a new ExamPaper created by a specific application user with specific subject
         [HttpPost]
         public ActionResult<ExamPaper> CreateExamPaper(CreateExamPaperDto createExamPaperDto)
         {
+            if (!ModelState.IsValid) return BadRequest();
             var examPaper = _mapper.Map<CreateExamPaperDto, ExamPaper>(createExamPaperDto);
             _unitOfWork.ExamPaper.Add(examPaper);
-            return Ok(examPaper);
+            _unitOfWork.Save();
+            var subjectInExam = _unitOfWork.Subject.FirstOrDefault(Subject => Subject.SubjectId == examPaper.SubjectId);
+            if (subjectInExam == null) return BadRequest();
+            subjectInExam.ExamPaperId = examPaper.ExamPaperId;
+            _unitOfWork.Save();
+            return Ok(JsonConvert.SerializeObject(examPaper, _jsonSettings));
         }
-        //// GET: api/ExamPaper
 
-        //[HttpGet]
-        //public async Task<IActionResult> GetAllExamPapers()
-        //{
-        //    try
-        //    {
-        //        var examPapers = await _context.ExamPapers.Include(ExamPaper => ExamPaper.Questions).Include(ExamPaper=>ExamPaper.ApplicationUsers).ToListAsync();
-        //        //var examPapers = await _context.ExamPapers.ToListAsync();
-        //        if (examPapers == null)
-        //        {
-        //            return NotFound("No exam papers found");
-        //        }
-        //        var examPaperList = new List<GetAllExamPaperDto>();
+        /// <summary>
+        /// This method retreives all ExamPapers with details like SubjectId, ApplicationUserId, All the Questions, Answers, AnswerSheetfrom the database
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        public IActionResult GetAllExamPaper()
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var examPaperFromDb = _unitOfWork.ExamPaper.GetAll(includeProperties: "Subject,ApplicationUsers,Questions,AnswerSheets");
+            var examPaperDtos = _mapper.Map<IEnumerable<GetExamPaperDto>>(examPaperFromDb);
+            return Ok(examPaperDtos);
+        }
 
-        //        foreach (var examPaper in examPapers)
-        //        {
-        //            var getAllExamPaperDto = new GetAllExamPaperDto
-        //            {
-        //                ExamPaperId = examPaper.ExamPaperId,
-        //                SubjectId = examPaper.SubjectId,
-        //                Questions = examPaper.Questions.ToList(),
-        //                ApplicationUserId = examPaper.ApplicationUsers.Select(ApplicationUser => ApplicationUser.Id).ToList(),
-        //                //AnswerSheetId = examPaper.AnswerSheets.Select(AnswerSheet => AnswerSheet.AnswerSheetId).ToList(),
-        //            };
-        //            examPaperList.Add(getAllExamPaperDto);
-        //        }
-        //        return Ok(examPaperList);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        /// <summary>
+        /// This methods retrieves the full info of the sepcified Exampaper 
+        /// including the details of Subject, ApplicationUser, AnswerSheet, Answer, Questions
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public IActionResult GetExamPaperById(int id)
+        {
+            if (!ModelState.IsValid) return BadRequest();
+            var examPaperFromDb = _unitOfWork.ExamPaper.FirstOrDefault(ExamPaper => ExamPaper.ExamPaperId == id, includeProperties: "Subject,Questions,AnswerSheets");
+            if (examPaperFromDb == null) return NotFound();
+            return Ok(JsonConvert.SerializeObject(examPaperFromDb, _jsonSettings));
+        }
 
-        //// GET: api/ExamPaper/5
-        //[HttpGet("{id}")]
-        //public async Task<IActionResult> GetExamPaperById(int id)
-        //{
-        //    try
-        //    {
-        //        var examPaper = await _context.ExamPapers.FindAsync(id);
-        //        if (examPaper == null)
-        //        {
-        //            return NotFound($"Exam Paper with id {id} was not found");
-        //        }
+        /// <summary>
+        /// In this method, the Details of the Exampaper can be edited and updated. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="updateExamPaperDto"></param>
+        /// <returns></returns>
+        [HttpPut("{id}")]
+        public IActionResult UpdateExamPaper(int id, [FromBody] UpdateExamPaperDto updateExamPaperDto)
+        {
+            // Validate if the input id is equal to the id in the URL
+            if (id == updateExamPaperDto.ExamPaperId && !ModelState.IsValid) return BadRequest();
+            var examPaperFromDb = _unitOfWork.ExamPaper.Get(id);
+            if (examPaperFromDb == null) return NotFound();
+            var updateExamPaper = _mapper.Map<ExamPaper>(updateExamPaperDto);
+            _unitOfWork.ExamPaper.Update(updateExamPaper);
+            _unitOfWork.Save();
+            return Ok(updateExamPaperDto);
+        }
 
-        //        var getExamPaperByIdDto = new GetAllExamPaperDto
-        //        {
-        //            ExamPaperId = examPaper.ExamPaperId,
-        //            SubjectId = examPaper.SubjectId,
-        //            //ApplicationUserId = examPaper.ApplicationUsers.Select(ApplicationUser => ApplicationUser.Id).ToList(),
-        //            //QuestionId = examPaper.Questions.Select(Question => Question.QuestionId).ToList(),
-        //            //AnswerSheetId = examPaper.AnswerSheets.Select(AnswerSheet => AnswerSheet.AnswerSheetId).ToList(),
-        //        };
-        //        return Ok(getExamPaperByIdDto);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
+        [HttpDelete("{id}")]
+        public IActionResult DeleteExamPaper(int id)
+        {
+            if (!ModelState.IsValid) return BadRequest("Unable to delete ExamPaper");
+            var examPaper = _unitOfWork.ExamPaper.Get(id);
+            if (examPaper == null) return NotFound();
+            _unitOfWork.ExamPaper.Remove(examPaper);
+            _unitOfWork.Save();
+            return Ok(examPaper);
 
-        //[HttpPost]
-        //public async Task<IActionResult> CreateExamPaper(CreateExamPaperDto createExamPaperDto)
-        //{
-        //    try
-        //    {
-        //        var examPaper = new ExamPaper
-        //        {
-        //            SubjectId = createExamPaperDto.SubjectId,
-        //        };
-
-        //        var applicationUsers = new List<ApplicationUser>();
-        //        foreach (var userId in createExamPaperDto.ApplicationUserId)
-        //        {
-        //            var user = await _userManager.FindByIdAsync(userId);
-        //            if (user == null)
-        //            {
-        //                return BadRequest($"User with Id {userId} not found");
-        //            }
-        //            applicationUsers.Add(user);
-        //        }
-        //        examPaper.ApplicationUsers = applicationUsers;
-
-        //        _context.ExamPapers.Add(examPaper);
-        //        await _context.SaveChangesAsync();
-
-        //        var subjectInExam = _context.Subjects.FirstOrDefault(Subject => Subject.SubjectId == examPaper.SubjectId);
-        //        if (subjectInExam == null)
-        //        {
-        //            return BadRequest();
-        //        }
-        //        subjectInExam.ExamPaperId = examPaper.ExamPaperId;
-        //        await _context.SaveChangesAsync();
-
-
-        //        return Ok(JsonConvert.SerializeObject((new { examPaperId = examPaper.ExamPaperId, subjectId = examPaper.SubjectId }), _jsonSettings));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var requestId = HttpContext.TraceIdentifier;
-        //        _logger.LogError($"RequestId: {requestId} - Error creating exam paper. {ex}");
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error creating exam paper");
-        //    }
-        //}
-
-
-        ////[HttpPost]
-        ////public async Task<IActionResult> CreateExamPaper(CreateExamPaperDto createExamPaperDto)
-        ////{
-        ////    try
-        ////    {
-        ////        var examPaper = new ExamPaper
-        ////        {
-        ////            SubjectId = createExamPaperDto.SubjectId,
-        ////            ApplicationUsers = await _context.ApplicationUsers.Where(ApplicationUser => createExamPaperDto.ApplicationUserId.Contains(ApplicationUser.Id)).ToListAsync(),
-        ////            Questions = await _context.Questions.Where(Question => createExamPaperDto.QuestionId.Contains(Question.QuestionId)).ToListAsync(),
-        ////            AnswerSheets = await _context.AnswerSheets.Where(AnswerSheet => createExamPaperDto.AnswerSheetId.Contains(AnswerSheet.AnswerSheetId)).ToListAsync()
-        ////        };
-
-        ////        _context.ExamPapers.Add(examPaper);
-        ////        await _context.SaveChangesAsync();
-        ////        return Ok(new { examPaperId = examPaper.ExamPaperId });
-        ////    }
-        ////    catch (Exception ex)
-        ////    {
-        ////        var requestId = HttpContext.TraceIdentifier;
-        ////        _logger.LogError($"RequestId: {requestId} - Error adding exam paper. {ex}");
-        ////        return StatusCode(StatusCodes.Status500InternalServerError, "Error adding exam paper");
-        ////    }
-        ////}
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> PutExamPaper(int id, [FromBody] UpdateExamPaperDto updateExamPaperDto)
-        //{
-        //    var examPaper = await _context.ExamPapers.FindAsync(id);
-        //    if (examPaper == null)
-        //    {
-        //        return NotFound($"Exam paper with Id {id} does not exist");
-        //    }
-
-        //    examPaper.SubjectId = updateExamPaperDto.SubjectId;
-        //    if (examPaper.SubjectId == 0)
-        //    {
-        //        return BadRequest("Subject Id is not selected/added. Select/Add a Subject");
-        //    }
-        //    var subject = await _context.Subjects.FindAsync(examPaper.SubjectId);
-        //    if (subject == null)
-        //    {
-        //        return BadRequest("Invalid Subject Id selected/added.");
-        //    }
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //        return Ok(examPaper);
-        //    }
-        //    catch (DbUpdateConcurrencyException ex)
-        //    {
-        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-        //    }
-        //}
-
-        //[HttpDelete("{id}")]
-        //public async Task<IActionResult> DeleteExamPaper(int id)
-        //{
-        //    try
-        //    {
-        //        var examPaper = await _context.ExamPapers.FindAsync(id);
-        //        if (examPaper == null)
-        //        {
-        //            return NotFound($"Exam paper with Id {id} not found");
-        //        }
-        //        _context.ExamPapers.Remove(examPaper);
-        //        await _context.SaveChangesAsync();
-
-        //        return Ok();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        var requestId = HttpContext.TraceIdentifier;
-        //        _logger.LogError($"RequestId: {requestId} - Error deleting exam paper. {ex}");
-        //        return StatusCode(StatusCodes.Status500InternalServerError, "Error deleting exam paper");
-        //    }
-        //}
+        }
     }
-
 }

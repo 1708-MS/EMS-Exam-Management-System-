@@ -1,14 +1,11 @@
-﻿using CustomiseIdentity.Data;
-using CustomiseIdentity.Identity;
+﻿using AutoMapper;
+using CustomiseIdentity.Data;
 using CustomiseIdentity.Models;
 using CustomiseIdentity.Models.DTOs.QuestionDto;
+using CustomiseIdentity.Repository.iRepository;
 using Microsoft.AspNetCore.Builder.Extensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
+using Newtonsoft.Json;
 
 namespace CustomiseIdentity.Controller
 {
@@ -17,106 +14,114 @@ namespace CustomiseIdentity.Controller
     public class QuestionController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly JsonSerializerSettings _jsonSettings = new JsonSerializerSettings
+        {
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+        };
 
-        public QuestionController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        public QuestionController(ApplicationDbContext context, IUnitOfWork unitOfWork, IMapper mapper)
         {
             _context = context;
-            _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
+        //This method saves a new Question in the database
         [HttpPost]
-        public async Task<ActionResult<Question>> CreateQuestion([FromBody] CreateQuestionDto createQuestionDto)
+        public ActionResult CreateQuestion(CreateQuestionDto createQuestionDto)
         {
-            if (createQuestionDto.QuestionType == QuestionType.ShortAnswerQuestion || createQuestionDto.QuestionType == QuestionType.LongAnswerQuestion)
+            if (ModelState.IsValid && createQuestionDto.QuestionType == QuestionType.ShortAnswerQuestion || createQuestionDto.QuestionType == QuestionType.LongAnswerQuestion)
             {
-                if (createQuestionDto.ExamPaperId == null)
-                {
-                    var examPaperFromDb = await _context.ExamPapers.FindAsync(createQuestionDto.ExamPaperId);
-                    if (examPaperFromDb != null)
-                    {
-                        var question = new Question
-                        {
-                            QuestionText = createQuestionDto.QuestionText,
-                            QuestionMarks = createQuestionDto.QuestionMarks,
-                            QuestionType = QuestionType.ShortAnswerQuestion,
-                            ExamPaperId = createQuestionDto.ExamPaperId
-                        };
-                        _context.Questions.Add(question);
-                        await _context.SaveChangesAsync();
-                        return Ok();
-                    }
-                }
+                if (createQuestionDto.ExamPaperId == null && createQuestionDto.MCQOptions != null) return BadRequest();
+                var examPaperFromDb = _context.ExamPapers.Find(createQuestionDto.ExamPaperId);
+                if (examPaperFromDb == null) return BadRequest();
+                var createQuestion = _mapper.Map<Question>(createQuestionDto);
+                _unitOfWork.Question.Add(createQuestion);
+                _unitOfWork.Save();
+                return Ok(createQuestion);
             }
             else
             {
-                if (createQuestionDto.QuestionType == QuestionType.MCQs)
+                if (createQuestionDto.ExamPaperId == null && createQuestionDto.MCQOptions == null) return BadRequest();
+                var examPaperFromDb = _context.ExamPapers.Find(createQuestionDto.ExamPaperId);
+                if (examPaperFromDb == null) return BadRequest();
+                var createQuestion = _mapper.Map<Question>(createQuestionDto);
+                var mcqOptions = createQuestionDto.MCQOptions.Select(x => new MCQOption
                 {
-                    if (createQuestionDto.ExamPaperId == null) return BadRequest("ExamPaperId cannot be null, please select an exam paper");
-
-                    if (createQuestionDto.MCQOptions == null || !createQuestionDto.MCQOptions.Any()) return BadRequest("MCQOptions cannot be null, please provide at least one option");
-
-                    var examPaperFromDb = await _context.ExamPapers.FindAsync(createQuestionDto.ExamPaperId);
-
-                    if (examPaperFromDb == null) return BadRequest("Invalid ExamPaperId, please select a valid exam paper");
-
-                    var question = new Question
-                    {
-                        QuestionText = createQuestionDto.QuestionText,
-                        QuestionMarks = createQuestionDto.QuestionMarks,
-                        QuestionType = QuestionType.MCQs,
-                        ExamPaperId = createQuestionDto.ExamPaperId
-                    };
-
-                    var mcqOptions = createQuestionDto.MCQOptions.Select(option => new MCQOption
-                    {
-                        MCQOptionsOfQuestion = option.MCQOptionsOfQuestion,
-                        Question = question
-                    }).ToList();
-
-                    if (mcqOptions.Count > 1)
-                    {
-                        question.MCQOptions = mcqOptions;
-                        _context.Questions.Add(question);
-                        await _context.SaveChangesAsync();
-                        return Ok();
-                    }
-                    return BadRequest("Add atleast 2 options for the MCQ");
-                }
+                    MCQOptionsOfQuestion = x.MCQOptionsOfQuestion
+                }).ToList();
+                if (mcqOptions.Count < 1) return BadRequest("Enter atleast 2 options");
+                createQuestion.MCQOptions = mcqOptions;
+                _unitOfWork.Question.Add(createQuestion);
+                _unitOfWork.Save();
+                return Ok(JsonConvert.SerializeObject(createQuestion, _jsonSettings));
             }
-            return BadRequest("Invalid QuestionType, please select a valid QuestionType: ShortAnswerQuestion = 1, LongAnswerQuestion = 2, MCQs = 3");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllQuestions()
-        {
-            try
-            {
-                //var questions = await _context.Questions.ToListAsync();
-                var questions = await _context.Questions.Include(Question => Question.MCQOptions).ToListAsync();
-                if (questions == null) return NotFound("No questions found");
-                var questionList = new List<GetAllQuestionsDto>();
+        //[HttpGet("{id}")]
+        //public async Task<ActionResult<GetAllQuestionsDto>> GetQuestion(int id)
+        //{
+        //    if (!ModelState.IsValid) return BadRequest();
+        //    var question = await _unitOfWork.ques
 
-                foreach (var question in questions)
-                {
-                    var getAllQuestionDto = new GetAllQuestionsDto
-                    {
-                        QuestionId = question.QuestionId,
-                        QuestionText = question.QuestionText,
-                        QuestionMarks = question.QuestionMarks,
-                        ExamPaperId = question.ExamPaperId,
-                        AnswerId = question.AnswerId,
-                        QuestionType = question.QuestionType
-                    };
-                    questionList.Add(getAllQuestionDto);
-                }
-                return Ok(questionList);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }
-        }
+        //    if (question == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var questionDto = _mapper.Map<GetAllQuestionsDto>(question);
+        //    return Ok(questionDto);
+        //}
+
+        //[HttpPut("{id}")]
+        //public async Task<IActionResult> UpdateQuestion(int id, UpdateQuestionDto updateQuestionDto)
+        //{
+        //    var questionFromRepo = await _unitOfWork.QuestionRepository.GetQuestion(id);
+
+        //    if (questionFromRepo == null)
+        //        return NotFound();
+
+        //    _mapper.Map(updateQuestionDto, questionFromRepo);
+
+        //    if (await _unitOfWork.SaveChangesAsync())
+        //        return NoContent();
+
+        //    throw new Exception($"Updating question {id} failed on save");
+        //}
+
+
+        //[HttpGet]
+        //public async Task<IActionResult> GetAllQuestions()
+        //{
+        //    try
+        //    {
+        //        //var questions = await _context.Questions.ToListAsync();
+        //        var questions = await _context.Questions.Include(Question => Question.MCQOptions).ToListAsync();
+        //        if (questions == null) return NotFound("No questions found");
+        //        var questionList = new List<GetAllQuestionsDto>();
+
+        //        foreach (var question in questions)
+        //        {
+        //            var getAllQuestionDto = new GetAllQuestionsDto
+        //            {
+        //                QuestionId = question.QuestionId,
+        //                QuestionText = question.QuestionText,
+        //                QuestionMarks = question.QuestionMarks,
+        //                ExamPaperId = question.ExamPaperId,
+        //                AnswerId = question.AnswerId,
+        //                QuestionType = question.QuestionType
+        //            };
+        //            questionList.Add(getAllQuestionDto);
+        //        }
+        //        return Ok(questionList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
+        //    }
+        //}
 
 
     }

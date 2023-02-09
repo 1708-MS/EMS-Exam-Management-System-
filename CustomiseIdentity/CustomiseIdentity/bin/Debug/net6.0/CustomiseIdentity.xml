@@ -4,5 +4,27 @@
         <name>CustomiseIdentity</name>
     </assembly>
     <members>
+        <member name="M:CustomiseIdentity.Controller.ExamPaperController.GetAllExamPaper">
+            <summary>
+            This method retreives all ExamPapers with details like SubjectId, ApplicationUserId, All the Questions, Answers, AnswerSheetfrom the database
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CustomiseIdentity.Controller.ExamPaperController.GetExamPaperById(System.Int32)">
+            <summary>
+            This methods retrieves the full info of the sepcified Exampaper 
+            including the details of Subject, ApplicationUser, AnswerSheet, Answer, Questions
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CustomiseIdentity.Controller.ExamPaperController.UpdateExamPaper(System.Int32,CustomiseIdentity.Models.DTOs.ExamPaperDto.UpdateExamPaperDto)">
+            <summary>
+            In this method, the Details of the Exampaper can be edited and updated. 
+            </summary>
+            <param name="id"></param>
+            <param name="updateExamPaperDto"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

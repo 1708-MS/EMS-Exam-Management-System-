@@ -1,6 +1,6 @@
 ﻿namespace CustomiseIdentity.Models.DTOs.QuestionDto
 {
-    public class GetAllQuestionsDto
+    public class GetQuestionsDto
     {
         public int QuestionId { get; set; }
         public string QuestionText { get; set; }

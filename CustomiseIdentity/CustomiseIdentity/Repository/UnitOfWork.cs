@@ -12,10 +12,16 @@ namespace CustomiseIdentity.Repository
             _context = context;
             Subject = new SubjectRepository(_context);
             ExamPaper = new ExamPaperRepository(_context);
+            Question = new QuestionRepository(_context);
         }
 
         public ISubjectRepository Subject { get; private set; }
 
         public IExamPaperRepository ExamPaper { get; private set; }
+        public IQuestionRepository Question { get; private set; }
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
     }
 }
